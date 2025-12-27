@@ -17,7 +17,7 @@ RUN go mod download
 COPY . .
 
 # Build Service
-RUN go build -o stripeservice
+RUN go build -o internationalpaymentservice
 
 
 # Expose the necessary port
