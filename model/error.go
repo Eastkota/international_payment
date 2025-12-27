@@ -1,6 +1,6 @@
 package model
 
-type StripeError struct {
+type PaymentError struct {
 	Message string `json:"message"`
 	Code    string `json:"code"`
 	Field   string `json:"field,omitempty"`

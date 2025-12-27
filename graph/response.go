@@ -2,26 +2,26 @@ package schema
 
 import "github.com/graphql-go/graphql"
 
-var StripeResponse = graphql.NewObject(graphql.ObjectConfig{
-	Name: "StripeResponse",
+var PaymentResponse = graphql.NewObject(graphql.ObjectConfig{
+	Name: "PaymentResponse",
 	Fields: graphql.Fields{
 		"data": &graphql.Field{
-			Type: StripeResult,
+			Type: InternationalPaymentResult,
 		},
 		"error": &graphql.Field{
-			Type: StripeError,
+			Type: PaymentError,
 		},
 	},
 })
 
-var GenericStripeSuccessResponse = graphql.NewObject(graphql.ObjectConfig{
-	Name: "GenericStripeSuccessResponse",
+var GenericPaymentSuccessResponse = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GenericPaymentSuccessResponse",
 	Fields: graphql.Fields{
 		"data": &graphql.Field{
-			Type: GenericStripeSuccessData,
+			Type: InternationalPaymentResult, // Changed from GenericPaymentSuccessData
 		},
 		"error": &graphql.Field{
-			Type: StripeError,
+			Type: PaymentError,
 		},
 	},
 })

@@ -1,8 +1,8 @@
 package schema
 
 import (
-    "stripe_service/helpers"
-    "stripe_service/model"
+    "payment_service/helpers"
+    "payment_service/model"
 
     "fmt"
     "context"
@@ -14,8 +14,8 @@ import (
     "github.com/graphql-go/graphql"
 )
 
-func AuthMiddleware(next func(p graphql.ResolveParams) *model.GenericStripeResponse) func(p graphql.ResolveParams) *model.GenericStripeResponse {
-    return func(p graphql.ResolveParams) *model.GenericStripeResponse {
+func AuthMiddleware(next func(p graphql.ResolveParams) *model.GenericPaymentResponse) func(p graphql.ResolveParams) *model.GenericPaymentResponse {
+    return func(p graphql.ResolveParams) *model.GenericPaymentResponse {
         ctx := p.Context
         userInterface := ctx.Value("user")
 
@@ -48,8 +48,8 @@ func AuthMiddleware(next func(p graphql.ResolveParams) *model.GenericStripeRespo
     }
 }
 
-func PublicAuthMiddleware(next func(p graphql.ResolveParams) *model.GenericStripeResponse) func(p graphql.ResolveParams) *model.GenericStripeResponse {
-    return func(p graphql.ResolveParams) *model.GenericStripeResponse {
+func PublicAuthMiddleware(next func(p graphql.ResolveParams) *model.GenericPaymentResponse) func(p graphql.ResolveParams) *model.GenericPaymentResponse {
+    return func(p graphql.ResolveParams) *model.GenericPaymentResponse {
         ctx := p.Context
         req, ok := ctx.Value(model.RequestKey).(*http.Request)
         if !ok {

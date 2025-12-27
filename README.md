@@ -1,1 +1,1 @@
-# stripe_service
+# payment_service

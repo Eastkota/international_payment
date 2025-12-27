@@ -1,36 +1,26 @@
 package schema
 
 import (
-	"stripe_service/resolvers"
+	"payment_service/resolvers"
 
 	"github.com/graphql-go/graphql"
 )
 
-func NewMutationType(resolver *resolvers.StripeResolver) *graphql.Object {
+func NewMutationType(resolver *resolvers.PaymentResolver) *graphql.Object {
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
-			"createPaymentIntent": &graphql.Field{
-				Type: StripeResponse,
+			"createInternationalPayment": &graphql.Field{
+				Type:        InternationalPaymentResult,
+				Description: "Create International Payment",
 				Args: graphql.FieldConfigArgument{
 					"input": &graphql.ArgumentConfig{
-						Type: PaymentIntentInput,
+						Type: MercRequestInput,
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					// Extract input from arguments
-					return PublicAuthMiddleware(resolver.CreatePaymentIntent)(p), nil
-				},
-			},
-			"storePaymentIntent": &graphql.Field{
-				Type: GenericStripeSuccessResponse,
-				Args: graphql.FieldConfigArgument{
-					"input": &graphql.ArgumentConfig{
-						Type: StorePaymentIntentInput,
-					},
-				},
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return PublicAuthMiddleware(resolver.StorePaymentIntent)(p), nil
+					return resolver.CreateInternationalPayment(p)
 				},
 			},
 		},

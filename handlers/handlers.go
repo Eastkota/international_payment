@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"stripe_service/model"
+	"payment_service/model"
 	
 	"context"
 	"encoding/json"
 	"net/http"
-	"stripe_service/graph"
+	"payment_service/graph"
 
 	"github.com/graphql-go/graphql"
 	"github.com/labstack/echo/v4"
@@ -46,15 +46,16 @@ func Handler(ctx echo.Context) error {
 }
 
 func executeQuery(ctx context.Context, query string, variables map[string]interface{}) *graphql.Result {
-	StripeSchema, err := schema.GetSchema()
+	PaymentSchema, err := schema.GetSchema()
 	if err != nil {
 		return nil
 	}
 	res := graphql.Do(graphql.Params{
-		Schema:         *StripeSchema,
+		Schema:         *PaymentSchema,
 		RequestString:  query,
 		VariableValues: variables,
 		Context:        ctx,
 	})
 	return res
 }
+

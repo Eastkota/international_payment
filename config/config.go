@@ -16,16 +16,22 @@ const (
 	// BENF_ID                   = "BE10000169"
 	// BENF_BANK_CODE            = "01"
 	// CURRENCY                  = "BTN"
-	// PAYMENT_PRIVATE_KEY       = "keys/rma-payment.key"
-	// PAYMENT_PUBLIC_KEY        = "keys/public.key"
+	PAYMENT_PRIVATE_KEY       = "keys/private_key.pem"
+	PAYMENT_PUBLIC_KEY        = "keys/public_key.pem"
+	MK_REQUEST_URL            = "https://3dsecure.bob.bt/3dss/mkReq"
+	MERC_REQ_URL              = "https://3dsecure.bob.bt/3dss/mercReq"
 	// RMA_PAYMENT_API           = "https://bfssecure.rma.org.bt/BFSSecure/nvpapi"
-	Database                = "educareStripe"
+	Database                = "educare3DS"
     PaymentIntentCollection = "payment_intents"
 )
 
-func PublishedKey() string    { return os.Getenv("STRIPE_PUBLISHED_KEY") }
-func ClientSecretKey() string { return os.Getenv("STRIPE_SECRET_KEY") }
-
 func MembershipApi() string  { return os.Getenv("MEMBERSHIP_API") }
 func AuthServiceApi() string { return os.Getenv("AUTH_SERVICE_API") }
+
+// 3DS Merchant configuration functions
+func MerchantId() string     { return os.Getenv("MERCHANT_ID") }
+func MerchantSecret() string { return os.Getenv("MERCHANT_SECRET") }
+func MerchantApiUrl() string { return os.Getenv("MERCHANT_API_URL") }
+func MkRequestUrl() string   { return os.Getenv("MK_REQUEST_URL") }
+func MercReqUrl() string     { return os.Getenv("MERC_REQ_URL") }
 

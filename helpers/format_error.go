@@ -1,11 +1,20 @@
 package helpers
 
-import "stripe_service/model"
+import "payment_service/model"
 
-func FormatError(err error) *model.GenericStripeResponse {
-	return &model.GenericStripeResponse{
+func FormatError(err error) *model.GenericPaymentResponse {
+	return &model.GenericPaymentResponse{
 		Data: nil,
-		Error: &model.StripeError{
+		Error: &model.PaymentError{
+			Message: err.Error(),
+		},
+	}
+}
+
+func FormatInternationalPaymentError(err error) *model.GenericPaymentResponse {
+	return &model.GenericPaymentResponse{
+		Data: nil,
+		Error: &model.PaymentError{
 			Message: err.Error(),
 		},
 	}

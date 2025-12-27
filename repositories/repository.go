@@ -2,9 +2,10 @@ package repositories
 
 import (
 	"context"
-	"stripe_service/model"
+	
+	"payment_service/model"
 )
 
 type Repository interface {
-	StorePaymentIntent(ctx context.Context, inputData model.StorePaymentIntentInput) (error)
+    CreateMercRequest(ctx context.Context, input model.MercReqInput, transactionID string, purchaseDate string, mac string) error
 }

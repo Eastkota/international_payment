@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"stripe_service/config"
-	"stripe_service/model"
+	"payment_service/config"
+	"payment_service/model"
 
 	"context"
 	"fmt"

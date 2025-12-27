@@ -1,14 +1,14 @@
 package schema
 
 import (
-	"stripe_service/helpers"
-	"stripe_service/model"
-	"stripe_service/resolvers"
+	"payment_service/helpers"
+	"payment_service/model"
+	"payment_service/resolvers"
 
 	"github.com/graphql-go/graphql"
 )
 
-func NewQueryType(resolver *resolvers.StripeResolver) *graphql.Object { 
+func NewQueryType(resolver *resolvers.PaymentResolver) *graphql.Object { 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{

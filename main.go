@@ -1,14 +1,15 @@
 package main
 
 import (
-	"stripe_service/repositories"
-	"stripe_service/resolvers"
-	"stripe_service/services"
-	"stripe_service/graph"
-	"stripe_service/helpers"
-	"stripe_service/handlers"
+	"payment_service/repositories"
+	"payment_service/resolvers"
+	"payment_service/services"
+	"payment_service/graph"
+	"payment_service/helpers"
+	"payment_service/handlers"
 
 	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
@@ -26,9 +27,9 @@ func main() {
     if err != nil {
         log.Fatal("Failed to connect to database: " + err.Error())
     }
-    stripeRepository := repositories.NewStripeRepository(db)
-    stripeService := services.NewStripeService(stripeRepository)
-    resolver := resolvers.NewStripeResolver(stripeService)
+    paymentRepository := repositories.NewPaymentRepository(db)
+    paymentService := services.NewPaymentService(paymentRepository)
+    resolver := resolvers.NewPaymentResolver(paymentService)
 
     mutationType := schema.NewMutationType(resolver)
 	queryType := schema.NewQueryType(resolver)
@@ -41,6 +42,18 @@ func main() {
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
 	}))
 	e.POST("/graphql", handlers.Handler)
+	e.POST("/mkReq", func(c echo.Context) error {
+        // We call the function from services
+        // ctx is needed for the HTTP request inside SendMKRequest
+        result, err := services.SendMKRequest(c.Request().Context())
+        if err != nil {
+            return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+                "status": "error",
+                "message": err.Error(),
+            })
+        }
+        return c.JSON(http.StatusOK, result)
+    })
 	e.Logger.Fatal(e.Start(":8096"))
 }
 

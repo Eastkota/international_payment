@@ -2,10 +2,9 @@ package services
 
 import (
 	"context"
-	"stripe_service/model"
+	"payment_service/model"
 )
 
 type Services interface {
-	CreatePaymentIntent(ctx context.Context, inputData model.PaymentIntentInput) (*model.Stripe, error)
-	StorePaymentIntent(ctx context.Context, inputData model.StorePaymentIntentInput) (error)
+	CreateInternationalPayment(ctx context.Context, inputData model.MercReqInput) (*model.InternationalPaymentResult, error)
 }
