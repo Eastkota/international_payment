@@ -21,8 +21,8 @@ RUN go build -o stripeservice
 
 
 # Expose the necessary port
-EXPOSE 8096
+EXPOSE 8104
 
 # Command to run the service
-CMD ["./stripeservice"]
+CMD ["./internationalpaymentservice"]
 
