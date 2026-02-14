@@ -5,7 +5,6 @@ import (
 	"payment_service/model"
 
 	"context"
-	"fmt"
 
 	"github.com/machinebox/graphql"
 )
@@ -52,10 +51,10 @@ func ValidateToken(tokenStr string) (*model.User, error) {
 
 	err := authServiceClient.Run(context.Background(), req, &response)
 	if err != nil {
-		return nil, fmt.Errorf("invalid_token: %v", err)
+		return nil, NewUnauthorizedError("invalid_token")
 	}
 	if response.ValidateToken.Error.Message != "" {
-		return nil, fmt.Errorf(response.ValidateToken.Error.Message)
+		return nil, NewUnauthorizedError(response.ValidateToken.Error.Message)
 	}
 	return &response.ValidateToken.Data.User, err
 }

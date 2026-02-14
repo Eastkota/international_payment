@@ -1,11 +1,12 @@
 package resolvers
 
 import (
+	"payment_service/helpers"
 	"payment_service/model"
 	"payment_service/services"
 
 	"encoding/json"
-	
+
 	"github.com/graphql-go/graphql"
 )
 
@@ -29,11 +30,12 @@ func (r *PaymentResolver) CreateInternationalPayment(p graphql.ResolveParams) (i
     // 2. Call Service
     result, err := r.Services.CreateInternationalPayment(p.Context, paymentInput)
     if err != nil {
-        // Return the error inside the result structure
+        resp := helpers.FormatError(err)
         return map[string]interface{}{
             "error": map[string]interface{}{
-                "message": err.Error(),
-                "code":    "SERVICE_ERROR",
+                "message": resp.Error.Message,
+                "code":    resp.Error.Code,
+                "field":   resp.Error.Field,
             },
         }, nil
     }

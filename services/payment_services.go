@@ -27,12 +27,12 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
     // 1. Read your public key
     pubKeyBytes, err := os.ReadFile(config.PAYMENT_PUBLIC_KEY)
     if err != nil {
-        return nil, fmt.Errorf("failed to read public key: %v", err)
+        return nil, helpers.WrapInternal("read public key", err)
     }
 
     // Bank requires RSA 2048 encoded in Base64Url
     formattedPubKey := helpers.FormatKeyToBase64Url(pubKeyBytes)
-    
+
     merchantID := config.MerchantId()
     fmt.Println("Using Merchant ID:", merchantID)
     // Transaction ID must be minimum 6 digits
@@ -50,13 +50,13 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
     }
 
     jsonData, _ := json.Marshal(reqBody)
-    
+
     // Log this to confirm it looks exactly like the bank's sample
     fmt.Println("SENDING JSON:", string(jsonData))
 
     resp, err := http.Post(config.MK_REQUEST_URL, "application/json", bytes.NewBuffer(jsonData))
     if err != nil {
-        return nil, err
+        return nil, helpers.WrapInternal("send MK request", err)
     }
     defer resp.Body.Close()
 
@@ -68,8 +68,8 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
 
     // Check errorCode from your list (e.g., 201, 5A0)
     if code, ok := rawResponse["errorCode"].(string); ok && code != "000" {
-        description := helpers.GetResponseDescription(code) //
-        return nil, fmt.Errorf("Bank Error %s: %s", code, description)
+        description := helpers.GetResponseDescription(code)
+        return nil, helpers.NewInternalError(fmt.Sprintf("Bank Error %s: %s", code, description), nil)
     }
 
     // Map successful response (echoes merchantId/purchaseId and returns bank pubKey)
@@ -83,21 +83,21 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
 // CreateInternationalPayment handles the standard payment flow
 
 func (s *PaymentService) CreateInternationalPayment(ctx context.Context, inputData model.MercReqInput) (*model.InternationalPaymentResult, error) {
-    txID := fmt.Sprintf("%d", time.Now().Unix()) 
+    txID := fmt.Sprintf("%d", time.Now().Unix())
     purchaseDate := time.Now().Format("20060102150405")
-    currencyCode := "840" 
+    currencyCode := "840"
 
     // 1. Generate MAC
     dataToSign := config.MerchantId() + txID + inputData.TransactionAmount + currencyCode + purchaseDate + "SALES"
     mac, err := helpers.GenerateMac(dataToSign, config.PAYMENT_PRIVATE_KEY)
     if err != nil {
-        return nil, err
+        return nil, helpers.WrapInternal("generate MAC", err)
     }
 
     // 2. Fix the "not enough arguments" error here
     err = s.Repository.CreateMercRequest(ctx, inputData, txID, purchaseDate, mac)
     if err != nil {
-        return nil, fmt.Errorf("db error: %v", err)
+        return nil, helpers.WrapInternal("create payment record", err)
     }
 
     // 3. This matches the struct we fixed in Step 1
