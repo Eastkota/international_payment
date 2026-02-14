@@ -17,6 +17,8 @@ func Handler(ctx echo.Context) error {
 		return echo.ErrMethodNotAllowed
 	}
 
+	ctx.Request().Body = http.MaxBytesReader(ctx.Response(), ctx.Request().Body, 1<<20) // 1MB limit
+
 	var operation map[string]interface{}
 	err := json.NewDecoder(ctx.Request().Body).Decode(&operation)
 	if err != nil {
@@ -58,4 +60,3 @@ func executeQuery(ctx context.Context, query string, variables map[string]interf
 	})
 	return res
 }
-

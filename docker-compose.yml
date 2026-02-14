@@ -1,0 +1,23 @@
+services:
+  internationalpaymentservice:
+    image: internationalpaymentservice:latest
+    container_name: internationalpaymentservice
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    ports:
+      - "8104:8104"
+    networks:
+      - educareNetwork
+    healthcheck:
+      test: wget -qO- http://localhost:8104/health || exit 1
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  educareNetwork:
+    external: true
