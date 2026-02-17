@@ -27,7 +27,7 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
     // 1. Read your public key
     pubKeyBytes, err := os.ReadFile(config.PAYMENT_PUBLIC_KEY)
     if err != nil {
-        return nil, helpers.WrapInternal("read public key", err)
+        return nil, helpers.WrapInternal("processing payment", err)
     }
 
     // Bank requires RSA 2048 encoded in Base64Url
@@ -56,7 +56,7 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
 
     resp, err := http.Post(config.MK_REQUEST_URL, "application/json", bytes.NewBuffer(jsonData))
     if err != nil {
-        return nil, helpers.WrapInternal("send MK request", err)
+        return nil, helpers.WrapInternal("processing payment", err)
     }
     defer resp.Body.Close()
 
@@ -91,13 +91,13 @@ func (s *PaymentService) CreateInternationalPayment(ctx context.Context, inputDa
     dataToSign := config.MerchantId() + txID + inputData.TransactionAmount + currencyCode + purchaseDate + "SALES"
     mac, err := helpers.GenerateMac(dataToSign, config.PAYMENT_PRIVATE_KEY)
     if err != nil {
-        return nil, helpers.WrapInternal("generate MAC", err)
+        return nil, helpers.WrapInternal("processing payment", err)
     }
 
     // 2. Fix the "not enough arguments" error here
     err = s.Repository.CreateMercRequest(ctx, inputData, txID, purchaseDate, mac)
     if err != nil {
-        return nil, helpers.WrapInternal("create payment record", err)
+        return nil, helpers.WrapInternal("saving payment details", err)
     }
 
     // 3. This matches the struct we fixed in Step 1

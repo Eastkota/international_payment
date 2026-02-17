@@ -64,7 +64,7 @@ func GetMembership(userID uuid.UUID) (*model.AuthUserMembership, error) {
 	// Execute the request
 	err := membershipServiceClient.Run(context.Background(), req, &tempResponse)
 	if err != nil {
-		return nil, WrapInternal("fetch user profile", err)
+		return nil, WrapInternal("loading your profile", err)
 	}
 	// Check for errors in response
 	if tempResponse.FetchMembershipByUserId.Error.Message != "" {
