@@ -25,24 +25,24 @@ func AuthMiddleware(next func(p graphql.ResolveParams) *model.GenericPaymentResp
                 authHeader := req.Header.Get("Authorization")
                 u, err := helpers.ValidateToken(authHeader)
                 if err != nil {
-                    return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+                    return helpers.FormatError(helpers.NewTokenExpiredError("Your session has expired"))
                 }
                 if u == nil {
-                    return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+                    return helpers.FormatError(helpers.NewTokenExpiredError("Your session has expired"))
                 }
 
                 ctx = context.WithValue(ctx, "user", u)
                 p.Context = ctx
                 user = u
             } else {
-                return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+                return helpers.FormatError(helpers.NewTokenExpiredError("Your session has expired"))
             }
         } else {
             user, _ = userInterface.(*model.User)
         }
 
         if user == nil {
-            return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+            return helpers.FormatError(helpers.NewTokenExpiredError("Your session has expired"))
         }
         return next(p)
     }
@@ -53,12 +53,12 @@ func PublicAuthMiddleware(next func(p graphql.ResolveParams) *model.GenericPayme
         ctx := p.Context
         req, ok := ctx.Value(model.RequestKey).(*http.Request)
         if !ok {
-            return helpers.FormatError(helpers.NewUnauthorizedError("invalid request"))
+            return helpers.FormatError(helpers.NewUnauthorizedError("Unauthorized"))
         }
 
         authHeader := req.Header.Get("Authorization")
         if authHeader == "" {
-            return helpers.FormatError(helpers.NewUnauthorizedError("unauthorized"))
+            return helpers.FormatError(helpers.NewUnauthorizedError("Unauthorized"))
         }
 
         envPublicToken := os.Getenv("PUBLIC_ACCESS_TOKEN")
@@ -74,10 +74,10 @@ func PublicAuthMiddleware(next func(p graphql.ResolveParams) *model.GenericPayme
 
         u, err := helpers.ValidateToken(authHeader)
         if err != nil {
-            return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+            return helpers.FormatError(err)
         }
         if u == nil {
-            return helpers.FormatError(helpers.NewUnauthorizedError("invalid token"))
+            return helpers.FormatError(helpers.NewUnauthorizedError("Unauthorized"))
         }
 
         ctx = context.WithValue(ctx, model.UserKey, u)
