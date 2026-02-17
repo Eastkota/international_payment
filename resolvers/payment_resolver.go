@@ -23,7 +23,7 @@ func (r *PaymentResolver) CreateInternationalPayment(p graphql.ResolveParams) (i
     var paymentInput model.MercReqInput
 
     // 1. Map Arguments
-    inputData := p.Args["input"].(map[string]interface{})
+    inputData, _ := p.Args["input"].(map[string]interface{})
     bytes, _ := json.Marshal(inputData)
     json.Unmarshal(bytes, &paymentInput)
 
