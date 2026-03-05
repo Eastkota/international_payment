@@ -49,12 +49,16 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
         PubKey:     formattedPubKey,
     }
 
-    jsonData, _ := json.Marshal(reqBody)
+    jsonData, err := json.Marshal(reqBody)
+    if err != nil {
+        return nil, helpers.WrapInternal("processing payment", err)
+    }
 
     // Log this to confirm it looks exactly like the bank's sample
     fmt.Println("SENDING JSON:", string(jsonData))
 
-    resp, err := http.Post(config.MK_REQUEST_URL, "application/json", bytes.NewBuffer(jsonData))
+    client := &http.Client{Timeout: 30 * time.Second}
+    resp, err := client.Post(config.MK_REQUEST_URL, "application/json", bytes.NewBuffer(jsonData))
     if err != nil {
         return nil, helpers.WrapInternal("processing payment", err)
     }
@@ -64,7 +68,9 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
 
     // 4. Decode Response
     var rawResponse map[string]interface{}
-    json.NewDecoder(resp.Body).Decode(&rawResponse)
+    if err := json.NewDecoder(resp.Body).Decode(&rawResponse); err != nil {
+        return nil, helpers.WrapInternal("reading bank response", err)
+    }
 
     // Check errorCode from your list (e.g., 201, 5A0)
     if code, ok := rawResponse["errorCode"].(string); ok && code != "000" {
@@ -74,8 +80,13 @@ func SendMKRequest(ctx context.Context) (*model.MPIKeyRequest, error) {
 
     // Map successful response (echoes merchantId/purchaseId and returns bank pubKey)
     var mkResponse model.MPIKeyRequest
-    b, _ := json.Marshal(rawResponse)
-    json.Unmarshal(b, &mkResponse)
+    b, err := json.Marshal(rawResponse)
+    if err != nil {
+        return nil, helpers.WrapInternal("processing bank response", err)
+    }
+    if err := json.Unmarshal(b, &mkResponse); err != nil {
+        return nil, helpers.WrapInternal("processing bank response", err)
+    }
 
     return &mkResponse, nil
 }
